@@ -9,20 +9,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --paper: #EDE6D6;
-    --card: #F8F4EA;
-    --ink: #2B2620;
-    --ink-soft: #6B6258;
-    --clay: #B5532F;
-    --clay-deep: #8A3C20;
-    --sage: #74815F;
-    --line: rgba(43,38,32,0.14);
-    --tape: rgba(181,83,47,0.18);
+    --paper:#EDE6D6;--card:#F8F4EA;--ink:#2B2620;--ink-soft:#6B6258;
+    --clay:#B5532F;--clay-deep:#8A3C20;--sage:#74815F;
+    --line:rgba(43,38,32,0.14);--tape:rgba(181,83,47,0.18);
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:'Work Sans',sans-serif;line-height:1.6;}
   h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:500;margin:0;}
-  .script{font-family:'Caveat',cursive;}
   a{color:var(--clay-deep);}
   ::selection{background:var(--tape);}
   .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
@@ -35,8 +28,11 @@
   nav button{font-family:'Work Sans',sans-serif;font-size:14px;background:none;border:none;padding:8px 14px;border-radius:20px;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
   nav button:hover{background:rgba(43,38,32,0.06);color:var(--ink);}
   nav button.active{background:var(--clay);color:#fdf6ee;}
+  .headright{display:flex;align-items:center;gap:10px;}
   .savebadge{font-size:12px;color:var(--sage);padding:4px 10px;border-radius:10px;background:rgba(116,129,95,0.12);}
   .savebadge.saving{color:var(--clay-deep);background:rgba(181,83,47,0.1);}
+  .lockbtn{background:none;border:none;cursor:pointer;font-size:18px;color:var(--ink-soft);padding:4px 6px;border-radius:8px;transition:color .15s;}
+  .lockbtn:hover{color:var(--clay-deep);}
   main{padding:48px 0 100px;}
   section{display:none;}
   section.active{display:block;animation:fade .35s ease;}
@@ -44,10 +40,9 @@
   .hero{margin-bottom:56px;}
   .eyebrow{font-size:13px;letter-spacing:.04em;color:var(--clay-deep);text-transform:uppercase;margin-bottom:10px;}
   .hero h1{font-size:46px;line-height:1.1;outline:none;}
-  .hero h1[contenteditable]:focus{border-bottom:1px dashed var(--clay);}
   .hero p.lede{font-size:18px;color:var(--ink-soft);max-width:560px;margin-top:14px;outline:none;}
-  .hero p.lede[contenteditable]:focus{border-bottom:1px dashed var(--clay);}
-  .hint{font-size:12px;color:var(--ink-soft);opacity:.7;margin-top:18px;}
+  [contenteditable="true"]:focus{border-bottom:1px dashed var(--clay);outline:none;}
+  [contenteditable="false"]{cursor:default;}
   .sechead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
   .sechead h2{font-size:28px;}
   .addbtn{background:var(--ink);color:var(--paper);border:none;padding:10px 18px;border-radius:24px;font-size:14px;cursor:pointer;font-family:'Work Sans',sans-serif;font-weight:500;display:inline-flex;align-items:center;gap:6px;}
@@ -67,45 +62,47 @@
   .empty .display{font-size:19px;color:var(--ink);margin-bottom:6px;}
   .lightbox{display:none;position:fixed;inset:0;background:rgba(20,17,12,0.86);z-index:100;align-items:center;justify-content:center;padding:30px;}
   .lightbox.open{display:flex;}
-  .lightbox img{max-width:90vw;max-height:80vh;border-radius:4px;box-shadow:0 20px 50px rgba(0,0,0,0.4);}
+  .lightbox img{max-width:90vw;max-height:80vh;border-radius:4px;}
   .lightbox .lbclose{position:absolute;top:24px;right:32px;background:none;border:none;color:#fdf6ee;font-size:28px;cursor:pointer;}
   .entry{display:grid;grid-template-columns:90px 1fr;gap:18px;padding:26px 0;border-top:1px solid var(--line);}
   .entry:last-child{border-bottom:1px solid var(--line);}
   .entry .date{font-family:'Caveat',cursive;font-size:20px;color:var(--clay-deep);padding-top:4px;}
   .entry h3{font-size:22px;margin-bottom:8px;}
   .entry .body{color:var(--ink-soft);font-size:15.5px;white-space:pre-wrap;}
-  .entry .meta{display:flex;gap:10px;margin-top:12px;}
-  .entry .meta button{font-size:12px;border:none;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:underline;padding:0;}
-  .entry .meta button:hover{color:var(--clay-deep);}
+  .entry .meta button{font-size:12px;border:none;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:underline;padding:0;margin-top:10px;}
   .tlitem{display:flex;gap:18px;padding-bottom:30px;position:relative;}
   .tlitem .dot{width:10px;height:10px;border-radius:50%;background:var(--sage);margin-top:7px;flex:none;}
   .tlitem:not(:last-child)::before{content:'';position:absolute;left:4px;top:18px;bottom:0;width:1px;background:var(--line);}
   .tlitem .when{font-size:13px;color:var(--sage);font-weight:500;margin-bottom:3px;}
   .tlitem h3{font-size:18px;}
   .tlitem p{color:var(--ink-soft);font-size:14.5px;margin:6px 0 0;}
-  .tlitem .meta{margin-top:8px;}
-  .tlitem .meta button{font-size:12px;border:none;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:underline;padding:0;}
-  .about p[contenteditable]{outline:none;max-width:620px;}
-  .about p[contenteditable]:focus{border-bottom:1px dashed var(--clay);}
+  .tlitem .meta button{font-size:12px;border:none;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:underline;padding:0;margin-top:8px;}
+  .about p{max-width:620px;}
   .aboutgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px;}
   .field{margin-bottom:16px;}
   .field label{font-size:12px;color:var(--ink-soft);display:block;margin-bottom:4px;}
-  .field span[contenteditable]{display:block;border-bottom:1px solid var(--line);padding:6px 0;outline:none;font-size:15px;}
-  .field span[contenteditable]:focus{border-color:var(--clay);}
+  .field span[contenteditable]{display:block;border-bottom:1px solid var(--line);padding:6px 0;font-size:15px;}
+  .field span[contenteditable="true"]:focus{border-color:var(--clay);}
   .modal{display:none;position:fixed;inset:0;background:rgba(20,17,12,0.5);z-index:90;align-items:center;justify-content:center;padding:20px;}
   .modal.open{display:flex;}
-  .modalcard{background:var(--card);border-radius:14px;padding:28px;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.25);}
-  .modalcard h3{font-size:21px;margin-bottom:18px;}
+  .modalcard{background:var(--card);border-radius:14px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.25);}
+  .modalcard h3{font-size:21px;margin-bottom:6px;}
+  .modalcard .sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;}
   .modalcard label{display:block;font-size:12px;color:var(--ink-soft);margin:14px 0 6px;}
-  .modalcard input[type=text],.modalcard input[type=date],.modalcard textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:'Work Sans',sans-serif;font-size:14px;background:#fff;color:var(--ink);}
+  .modalcard input[type=text],.modalcard input[type=date],.modalcard input[type=email],.modalcard input[type=password],.modalcard textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:'Work Sans',sans-serif;font-size:14px;background:#fff;color:var(--ink);}
   .modalcard textarea{min-height:120px;resize:vertical;}
   .modalrow{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
   .modalrow button{border:none;padding:9px 18px;border-radius:20px;font-size:14px;cursor:pointer;font-family:'Work Sans',sans-serif;}
   .btn-cancel{background:none;color:var(--ink-soft);}
   .btn-save{background:var(--ink);color:var(--paper);font-weight:500;}
   .btn-save:hover{background:var(--clay-deep);}
+  .errmsg{font-size:13px;color:var(--clay-deep);margin-top:10px;min-height:18px;}
   input[type=file]{display:none;}
   footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;color:var(--ink-soft);font-size:13px;}
+  .edit-only{display:none;}
+  body.editing .edit-only{display:inline-flex;}
+  body.editing .addbtn{display:inline-flex;}
+  body:not(.editing) .addbtn{display:none;}
   @media(max-width:640px){
     .hero h1{font-size:32px;}
     nav{order:3;width:100%;overflow-x:auto;}
@@ -119,8 +116,8 @@
 <header>
   <div class="wrap headbar">
     <div class="brand">
-      <span class="display" contenteditable="true" id="siteName">Your Name</span>
-      <span class="tag" contenteditable="true" id="siteTag">a running record of everything</span>
+      <span class="display" id="siteName">Your Name</span>
+      <span class="tag" id="siteTag">a running record of everything</span>
     </div>
     <nav id="tabs">
       <button data-tab="photos" class="active">Photos</button>
@@ -128,15 +125,18 @@
       <button data-tab="timeline">Everything</button>
       <button data-tab="about">About</button>
     </nav>
-    <span class="savebadge" id="saveBadge">All saved</span>
+    <div class="headright">
+      <span class="savebadge" id="saveBadge" style="display:none">All saved</span>
+      <button class="lockbtn" id="lockBtn" title="Owner login">🔒</button>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
   <div class="hero">
     <div class="eyebrow">Est. <span id="estYear"></span></div>
-    <h1 contenteditable="true" id="heroTitle">Everything, kept in one place.</h1>
-    <p class="lede" contenteditable="true" id="heroLede">Photos I've taken, things I've written, and a log of what I've made along the way. Click any text to edit it — changes save automatically.</p>
+    <h1 id="heroTitle">Everything, kept in one place.</h1>
+    <p class="lede" id="heroLede">Photos I've taken, things I've written, and a log of what I've made along the way.</p>
   </div>
 
   <section id="photos" class="active">
@@ -169,27 +169,45 @@
 
   <section id="about" class="about">
     <div class="sechead"><h2>About</h2></div>
-    <p contenteditable="true" id="aboutBio">Write a little about yourself here — who you are, what you make, what this archive holds.</p>
+    <p id="aboutBio">Write a little about yourself here.</p>
     <div class="aboutgrid">
       <div>
-        <div class="field"><label>Email</label><span contenteditable="true" id="f_email">you@example.com</span></div>
-        <div class="field"><label>Location</label><span contenteditable="true" id="f_location">Somewhere, Earth</span></div>
+        <div class="field"><label>Email</label><span id="f_email">you@example.com</span></div>
+        <div class="field"><label>Location</label><span id="f_location">Somewhere, Earth</span></div>
       </div>
       <div>
-        <div class="field"><label>Website</label><span contenteditable="true" id="f_website">yoursite.com</span></div>
-        <div class="field"><label>Find me on</label><span contenteditable="true" id="f_social">@yourhandle</span></div>
+        <div class="field"><label>Website</label><span id="f_website">yoursite.com</span></div>
+        <div class="field"><label>Find me on</label><span id="f_social">@yourhandle</span></div>
       </div>
     </div>
   </section>
 </main>
 
-<footer>Your archive — saved to the cloud automatically.</footer>
+<footer>Your archive — saved automatically.</footer>
 
 <div class="lightbox" id="lightbox">
   <button class="lbclose" id="lbClose">&times;</button>
   <img id="lbImg" src="" alt="">
 </div>
 
+<!-- Login modal -->
+<div class="modal" id="loginModal">
+  <div class="modalcard">
+    <h3>Owner login</h3>
+    <p class="sub">Sign in to edit your archive.</p>
+    <label>Email</label>
+    <input type="email" id="loginEmail" value="atxmixgd@gmail.com">
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="Your password">
+    <div class="errmsg" id="loginErr"></div>
+    <div class="modalrow">
+      <button class="btn-cancel" data-close="loginModal">Cancel</button>
+      <button class="btn-save" id="loginBtn">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- Entry modal -->
 <div class="modal" id="entryModal">
   <div class="modalcard">
     <h3>New writing entry</h3>
@@ -206,6 +224,7 @@
   </div>
 </div>
 
+<!-- Timeline modal -->
 <div class="modal" id="tlModal">
   <div class="modalcard">
     <h3>Log an item</h3>
@@ -229,41 +248,103 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 document.getElementById('estYear').textContent = new Date().getFullYear();
 
+let isOwner = false;
+
 // ---- save badge ----
 const badge = document.getElementById('saveBadge');
-function setSaving(){ badge.textContent = 'Saving…'; badge.className = 'savebadge saving'; }
-function setSaved(){ badge.textContent = 'All saved'; badge.className = 'savebadge'; }
-function setError(){ badge.textContent = 'Save failed'; badge.className = 'savebadge saving'; }
+function setSaving(){ badge.style.display=''; badge.textContent='Saving…'; badge.className='savebadge saving'; }
+function setSaved(){ badge.style.display=''; badge.textContent='All saved'; badge.className='savebadge'; }
+function setError(){ badge.style.display=''; badge.textContent='Save failed'; badge.className='savebadge saving'; }
 
-// ---- editable text fields ----
+// ---- edit mode ----
 const TEXT_IDS = ['siteName','siteTag','heroTitle','heroLede','aboutBio','f_email','f_location','f_website','f_social'];
-let saveTextTimer;
 
+function enableEditing(){
+  isOwner = true;
+  document.body.classList.add('editing');
+  document.getElementById('lockBtn').textContent = '🔓';
+  document.getElementById('lockBtn').title = 'Sign out';
+  TEXT_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    el.contentEditable = 'true';
+    if(id.startsWith('f_')) el.parentElement.style.cursor = 'text';
+  });
+  renderPhotos(currentPhotos);
+}
+
+function disableEditing(){
+  isOwner = false;
+  document.body.classList.remove('editing');
+  document.getElementById('lockBtn').textContent = '🔒';
+  document.getElementById('lockBtn').title = 'Owner login';
+  badge.style.display = 'none';
+  TEXT_IDS.forEach(id=>{
+    document.getElementById(id).contentEditable = 'false';
+  });
+  renderPhotos(currentPhotos);
+}
+
+// ---- lock button ----
+document.getElementById('lockBtn').onclick = async ()=>{
+  if(isOwner){
+    await sb.auth.signOut();
+    disableEditing();
+  } else {
+    document.getElementById('loginErr').textContent = '';
+    document.getElementById('loginPassword').value = '';
+    openModal('loginModal');
+    setTimeout(()=>document.getElementById('loginPassword').focus(), 100);
+  }
+};
+
+// ---- login ----
+document.getElementById('loginBtn').onclick = async ()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  document.getElementById('loginErr').textContent = 'Signing in…';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){
+    document.getElementById('loginErr').textContent = 'Wrong password — try again.';
+  } else {
+    closeModal('loginModal');
+    enableEditing();
+  }
+};
+
+document.getElementById('loginPassword').addEventListener('keydown', e=>{
+  if(e.key==='Enter') document.getElementById('loginBtn').click();
+});
+
+// ---- check existing session ----
+sb.auth.getSession().then(({ data })=>{
+  if(data.session) enableEditing();
+});
+
+// ---- editable text saving ----
+let saveTextTimer;
+TEXT_IDS.forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    if(!isOwner) return;
+    setSaving();
+    clearTimeout(saveTextTimer);
+    saveTextTimer = setTimeout(async ()=>{
+      const texts = {};
+      TEXT_IDS.forEach(i=>{ texts[i] = document.getElementById(i).innerText; });
+      const { error } = await sb.from('archive_content').update({ texts, updated_at: new Date() }).eq('id',1);
+      error ? setError() : setSaved();
+    }, 1200);
+  });
+});
+
+// ---- load texts ----
 async function loadTexts(){
   const { data } = await sb.from('archive_content').select('texts').eq('id',1).single();
   if(data && data.texts){
     TEXT_IDS.forEach(id=>{
-      if(data.texts[id] !== undefined){
-        document.getElementById(id).innerText = data.texts[id];
-      }
+      if(data.texts[id] !== undefined) document.getElementById(id).innerText = data.texts[id];
     });
   }
 }
-
-function scheduleTextSave(){
-  setSaving();
-  clearTimeout(saveTextTimer);
-  saveTextTimer = setTimeout(async ()=>{
-    const texts = {};
-    TEXT_IDS.forEach(id=>{ texts[id] = document.getElementById(id).innerText; });
-    const { error } = await sb.from('archive_content').update({ texts, updated_at: new Date() }).eq('id',1);
-    error ? setError() : setSaved();
-  }, 1200);
-}
-
-TEXT_IDS.forEach(id=>{
-  document.getElementById(id).addEventListener('input', scheduleTextSave);
-});
 
 // ---- tabs ----
 document.getElementById('tabs').addEventListener('click', e=>{
@@ -281,11 +362,13 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
 
 // ---- photos ----
+let currentPhotos = [];
 const photoGrid = document.getElementById('photoGrid');
 const photoEmpty = document.getElementById('photoEmpty');
 
 document.getElementById('uploadTrigger').onclick = ()=>document.getElementById('photoInput').click();
 document.getElementById('photoInput').addEventListener('change', async e=>{
+  if(!isOwner) return;
   const files = [...e.target.files];
   e.target.value = '';
   for(const file of files){
@@ -303,8 +386,9 @@ document.getElementById('photoInput').addEventListener('change', async e=>{
 });
 
 async function loadPhotos(){
-  const { data } = await sb.from('photos').select('*').order('created_at', { ascending: false });
-  renderPhotos(data || []);
+  const { data } = await sb.from('photos').select('*').order('created_at',{ ascending:false });
+  currentPhotos = data || [];
+  renderPhotos(currentPhotos);
 }
 
 function renderPhotos(photos){
@@ -315,27 +399,29 @@ function renderPhotos(photos){
     card.className = 'polaroid';
     card.innerHTML = `
       <div class="tape-strip"></div>
-      <button class="del" data-id="${p.id}">&times;</button>
+      ${isOwner ? `<button class="del" data-id="${p.id}">&times;</button>` : ''}
       <img src="${p.url}" alt="photo">
-      <div class="cap" contenteditable="true" data-id="${p.id}">${p.caption || 'add a caption'}</div>
+      <div class="cap" ${isOwner?'contenteditable="true"':''} data-id="${p.id}">${p.caption||'add a caption'}</div>
     `;
     card.querySelector('img').onclick = ()=>openLightbox(p.url);
-    card.querySelector('.del').onclick = async ev=>{
-      ev.stopPropagation();
-      setSaving();
-      await sb.from('photos').delete().eq('id', p.id);
-      setSaved();
-      loadPhotos();
-    };
-    let capTimer;
-    card.querySelector('.cap').addEventListener('input', ev=>{
-      clearTimeout(capTimer);
-      setSaving();
-      capTimer = setTimeout(async ()=>{
-        await sb.from('photos').update({ caption: ev.target.innerText }).eq('id', p.id);
+    if(isOwner){
+      card.querySelector('.del').onclick = async ev=>{
+        ev.stopPropagation();
+        setSaving();
+        await sb.from('photos').delete().eq('id',p.id);
         setSaved();
-      }, 1000);
-    });
+        loadPhotos();
+      };
+      let capTimer;
+      card.querySelector('.cap').addEventListener('input', ev=>{
+        clearTimeout(capTimer);
+        setSaving();
+        capTimer = setTimeout(async ()=>{
+          await sb.from('photos').update({ caption: ev.target.innerText }).eq('id',p.id);
+          setSaved();
+        }, 1000);
+      });
+    }
     photoGrid.appendChild(card);
   });
 }
@@ -347,14 +433,14 @@ function openLightbox(src){
 document.getElementById('lbClose').onclick = ()=>document.getElementById('lightbox').classList.remove('open');
 document.getElementById('lightbox').addEventListener('click', e=>{ if(e.target.id==='lightbox') e.currentTarget.classList.remove('open'); });
 
-// ---- writing entries ----
+// ---- writing ----
 const entryList = document.getElementById('entryList');
 const entryEmpty = document.getElementById('entryEmpty');
 
 document.getElementById('newEntryBtn').onclick = ()=>{
-  document.getElementById('entryTitle').value = '';
-  document.getElementById('entryBody').value = '';
-  document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('entryTitle').value='';
+  document.getElementById('entryBody').value='';
+  document.getElementById('entryDate').value=new Date().toISOString().slice(0,10);
   openModal('entryModal');
 };
 
@@ -371,33 +457,32 @@ document.getElementById('entrySave').onclick = async ()=>{
 };
 
 async function loadEntries(){
-  const { data } = await sb.from('entries').select('*').order('entry_date', { ascending: false });
-  renderEntries(data || []);
+  const { data } = await sb.from('entries').select('*').order('entry_date',{ ascending:false });
+  renderEntries(data||[]);
 }
 
 function fmtDate(d){
   if(!d) return '';
-  const dt = new Date(d+'T00:00:00');
-  return dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 }
 
 function renderEntries(entries){
-  entryList.innerHTML = '';
+  entryList.innerHTML='';
   entryEmpty.style.display = entries.length ? 'none' : 'block';
   entries.forEach(en=>{
     const row = document.createElement('div');
-    row.className = 'entry';
-    row.innerHTML = `
+    row.className='entry';
+    row.innerHTML=`
       <div class="date">${fmtDate(en.entry_date)}</div>
       <div>
         <h3>${en.title}</h3>
         <div class="body">${en.body}</div>
-        <div class="meta"><button data-id="${en.id}">Delete</button></div>
+        ${isOwner ? `<div class="meta"><button data-id="${en.id}">Delete</button></div>` : ''}
       </div>
     `;
-    row.querySelector('.meta button').onclick = async ()=>{
+    if(isOwner) row.querySelector('.meta button').onclick = async ()=>{
       setSaving();
-      await sb.from('entries').delete().eq('id', en.id);
+      await sb.from('entries').delete().eq('id',en.id);
       setSaved();
       loadEntries();
     };
@@ -410,9 +495,9 @@ const tlList = document.getElementById('tlList');
 const tlEmpty = document.getElementById('tlEmpty');
 
 document.getElementById('newTlBtn').onclick = ()=>{
-  document.getElementById('tlTitle').value = '';
-  document.getElementById('tlBody').value = '';
-  document.getElementById('tlDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('tlTitle').value='';
+  document.getElementById('tlBody').value='';
+  document.getElementById('tlDate').value=new Date().toISOString().slice(0,10);
   openModal('tlModal');
 };
 
@@ -429,28 +514,28 @@ document.getElementById('tlSave').onclick = async ()=>{
 };
 
 async function loadTimeline(){
-  const { data } = await sb.from('timeline').select('*').order('item_date', { ascending: false });
-  renderTimeline(data || []);
+  const { data } = await sb.from('timeline').select('*').order('item_date',{ ascending:false });
+  renderTimeline(data||[]);
 }
 
 function renderTimeline(items){
-  tlList.innerHTML = '';
+  tlList.innerHTML='';
   tlEmpty.style.display = items.length ? 'none' : 'block';
   items.forEach(t=>{
     const row = document.createElement('div');
-    row.className = 'tlitem';
-    row.innerHTML = `
+    row.className='tlitem';
+    row.innerHTML=`
       <div class="dot"></div>
       <div style="flex:1">
         <div class="when">${fmtDate(t.item_date)}</div>
         <h3>${t.title}</h3>
         <p>${t.body}</p>
-        <div class="meta"><button data-id="${t.id}">Delete</button></div>
+        ${isOwner ? `<div class="meta"><button data-id="${t.id}">Delete</button></div>` : ''}
       </div>
     `;
-    row.querySelector('.meta button').onclick = async ()=>{
+    if(isOwner) row.querySelector('.meta button').onclick = async ()=>{
       setSaving();
-      await sb.from('timeline').delete().eq('id', t.id);
+      await sb.from('timeline').delete().eq('id',t.id);
       setSaved();
       loadTimeline();
     };
